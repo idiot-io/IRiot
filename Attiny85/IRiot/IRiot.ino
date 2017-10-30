@@ -1,6 +1,6 @@
 //more info at https://github.com/shenkarSElab/IRiot
 
-#include "attiny85_ir_send.h"
+#include "tiny_IRremote.h"
 
 #define ledPin    0     // pin5 / PB3
 //#define touchPin  4     // pin3 / PB4
@@ -27,6 +27,7 @@ void loop() {
 
     if (ledState == LOW) {
       ledState = HIGH;
+      send_ir();
     } else {
       ledState = LOW;
     }
