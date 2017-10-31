@@ -1,10 +1,15 @@
 //more info at https://github.com/shenkarSElab/IRiot
 
-#include "tiny_IRremote.h"
+/*
+   "With timer1 running off the PLL @ 64mhz, tone() should be able to output a 32mhz signal on pin 4!"
+*/
 
-#define ledPin    0     // pin5 / PB3
-//#define touchPin  4     // pin3 / PB4
-IRsend irsend;          // pin6 / PB1 / Digital 1
+#include "tiny_IRremote.h"
+#include "TinyTouchLib.h"
+
+#define ledPin    0     // pin5 / PB0
+//#define touchPin
+IRsend irsend;          // pin3 / PB4 / Digital 4 / TIMER1 output compare unit
 
 //change 00000 to a NEC code!
 #define YOUR_NEC_CODE 9000
@@ -14,6 +19,7 @@ unsigned long previousMillis = 0;
 const long interval = 1000;
 
 void setup() {
+  tinytouch_init();
 
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
@@ -21,7 +27,7 @@ void setup() {
 
 void loop() {
   unsigned long currentMillis = millis();
-
+  int intCap = tinytouch_sense();
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
 
