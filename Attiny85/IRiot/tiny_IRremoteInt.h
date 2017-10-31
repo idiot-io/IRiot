@@ -61,20 +61,6 @@
 #define NEC_ZERO_SPACE	560
 #define NEC_RPT_SPACE	2250
 
-#define SONY_HDR_MARK	2400
-#define SONY_HDR_SPACE	600
-#define SONY_ONE_MARK	1200
-#define SONY_ZERO_MARK	600
-#define SONY_RPT_LENGTH 45000
-
-#define RC5_T1		889
-#define RC5_RPT_LENGTH	46000
-
-#define RC6_HDR_MARK	2666
-#define RC6_HDR_SPACE	889
-#define RC6_T1		444
-#define RC6_RPT_LENGTH	46000
-
 #define TOLERANCE 25  // percent tolerance in measurements
 #define LTOL (1.0 - TOLERANCE/100.) 
 #define UTOL (1.0 + TOLERANCE/100.) 
@@ -118,9 +104,6 @@ extern volatile irparams_t irparams;
 #define TOPBIT 0x80000000
 
 #define NEC_BITS 32
-#define SONY_BITS 12
-#define MIN_RC5_SAMPLES 11
-#define MIN_RC6_SAMPLES 1
 
 #endif
 
