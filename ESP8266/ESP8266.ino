@@ -1,17 +1,17 @@
 /*
- * IRremoteESP8266: IRrecvDemo - demonstrates receiving IR codes with IRrecv
- * An IR detector/demodulator must be connected to the input RECV_PIN.
- * Copyright 2009 Ken Shirriff, http://arcfn.com
- * Example circuit diagram:
- *  https://github.com/markszabo/IRremoteESP8266/wiki#ir-receiving
- * Changes:
- *   Version 0.2 June, 2017
- *     Changed GPIO pin to the same as other examples.
- *     Used our own method for printing a uint64_t.
- *     Changed the baud rate to 115200.
- *   Version 0.1 Sept, 2015
- *     Based on Ken Shirriff's IrsendDemo Version 0.1 July, 2009
- */
+   IRremoteESP8266: IRrecvDemo - demonstrates receiving IR codes with IRrecv
+   An IR detector/demodulator must be connected to the input RECV_PIN.
+   Copyright 2009 Ken Shirriff, http://arcfn.com
+   Example circuit diagram:
+    https://github.com/markszabo/IRremoteESP8266/wiki#ir-receiving
+   Changes:
+     Version 0.2 June, 2017
+       Changed GPIO pin to the same as other examples.
+       Used our own method for printing a uint64_t.
+       Changed the baud rate to 115200.
+     Version 0.1 Sept, 2015
+       Based on Ken Shirriff's IrsendDemo Version 0.1 July, 2009
+*/
 
 #ifndef UNIT_TEST
 #include <Arduino.h>
@@ -25,14 +25,19 @@
 uint16_t RECV_PIN = 14;
 
 IRrecv irrecv(RECV_PIN);
-
 decode_results results;
+
+#define ledStatus 2
 
 void setup() {
   Serial.begin(115200);
   Serial.println("starting..");
-  
+
   irrecv.enableIRIn();  // Start the receiver
+
+  pinMode(ledStatus, OUTPUT);
+  digitalWrite(ledStatus, LOW);
+
 }
 
 void loop() {
@@ -40,7 +45,10 @@ void loop() {
     // print() & println() can't handle printing long longs. (uint64_t)
     serialPrintUint64(results.value, HEX);
     Serial.println("");
+    digitalWrite(ledStatus, HIGH);
     irrecv.resume();  // Receive the next value
   }
   delay(100);
+  digitalWrite(ledStatus, LOW);
+
 }
