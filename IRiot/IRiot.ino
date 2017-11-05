@@ -73,11 +73,15 @@ uint8_t timer;
 #endif
 //============================================================
 
+int netcode;
+
 void setup() {
   tinytouch_init();
 
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
+  
+  netcode=random(314);
 }
 
 void loop() {
@@ -85,7 +89,9 @@ void loop() {
   uint8_t touchstate = tinytouch_sense();
   if (touchstate == tt_push) {
     ledState = HIGH;
-    irsend.sendNEC(YOUR_NEC_CODE, 32); // sending the nec code
+    //irsend.sendNEC(YOUR_NEC_CODE, 32); // sending the nec code
+	
+    irsend.sendNEC(netcode, 32); // sending the nec code
     digitalWrite(ledPin, ledState);
   }
   if (touchstate == tt_release) {

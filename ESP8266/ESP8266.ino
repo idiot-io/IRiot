@@ -1,39 +1,57 @@
-/*
-   IRremoteESP8266: IRrecvDemo - demonstrates receiving IR codes with IRrecv
-   An IR detector/demodulator must be connected to the input RECV_PIN.
-   Copyright 2009 Ken Shirriff, http://arcfn.com
-   Example circuit diagram:
-    https://github.com/markszabo/IRremoteESP8266/wiki#ir-receiving
-   Changes:
-     Version 0.2 June, 2017
-       Changed GPIO pin to the same as other examples.
-       Used our own method for printing a uint64_t.
-       Changed the baud rate to 115200.
-     Version 0.1 Sept, 2015
-       Based on Ken Shirriff's IrsendDemo Version 0.1 July, 2009
+
+/* 
+ *  test on your server with 
+ *  $ mosquitto_sub -h 127.0.0.1 -i testSub -t outLicks
+ *  
 */
 
-#ifndef UNIT_TEST
-#include <Arduino.h>
-#endif
+/////////////////////////////////////////////////////////////////////////////
+//wifi manager     https://github.com/tzapu/WiFiManager
+#include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <WiFiManager.h>
+
+/////////////////////////////////////////////////////////////////////////////
+//irRemote code https://github.com/markszabo/IRremoteESP8266/wiki#ir-receiving
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 #include <IRutils.h>
-
-// An IR detector/demodulator is connected to GPIO pin 14(D5 on a NodeMCU
-// board).
+// An IR detector/demodulator is connected to GPIO pin 14(D5 on a NodeMCU).
 uint16_t RECV_PIN = 14;
-
 IRrecv irrecv(RECV_PIN);
 decode_results results;
 
+/////////////////////////////////////////////////////////////////////////////
+//mqtt broker https://github.com/knolleary/pubsubclient
+#include <PubSubClient.h>
+WiFiClient espClient;
+PubSubClient client(espClient);
+long lastMsg = 0;
+char msg[50];
+int value = 0;
+
+const char* mqtt_server = "idiot.io";
+
+///////////////////////////////////////////////
+// pysicals
 #define ledStatus 2
 
 void setup() {
   Serial.begin(115200);
   Serial.println("starting..");
 
+  //wifi manger
+  WiFiManager wifiManager;
+  wifiManager.autoConnect("AutoConnectAP");
+  Serial.println("connected...yeey :)");
+
+  //IRrecv
   irrecv.enableIRIn();  // Start the receiver
+
+  //MQTT
+  client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
 
   pinMode(ledStatus, OUTPUT);
   digitalWrite(ledStatus, LOW);
@@ -41,14 +59,87 @@ void setup() {
 }
 
 void loop() {
+  //mqtt loop
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
+
+  //ir recv callback
   if (irrecv.decode(&results)) {
+    digitalWrite(ledStatus, HIGH);
+
+    //mqtt
+
+	String payload = "{\"licked\":";
+	// Args:
+	//   input: The value to print
+	//   base:  The output base.
+	payload += uint64ToString(uint64_t results.value(),uint8_t 8) ;
+	payload += ",\"millis\":";
+	payload += millis();
+	payload += "}";
+  
+
+	
+	if (client.publish(outLicks, (char*) payload.c_str())) {
+      Serial.println("Publish ok");
+    }
+	else {
+      Serial.println("Publish failed");
+    }
+	
+	/*
+	++value;
+    snprintf (msg, 128, "licked %lld @ %ld", results.value, millis() );
+	
+	
+	    Serial.print("Publish message: ");
+    Serial.println(msg);
+    client.publish("outLicks", msg);
+	
     // print() & println() can't handle printing long longs. (uint64_t)
     serialPrintUint64(results.value, HEX);
     Serial.println("");
-    digitalWrite(ledStatus, HIGH);
+
+	*/
+    delay(100);
+    
     irrecv.resume();  // Receive the next value
   }
-  delay(100);
+
+  
   digitalWrite(ledStatus, LOW);
 
+}
+
+//MQTT functions
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i = 0; i < length; i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+}
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.connect("arduinoClient")) {
+      Serial.println("connected");
+      // Once connected, publish an announcement...
+      client.publish("outTopic", "hello world");
+      // ... and resubscribe
+      client.subscribe("inTopic");
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
 }
