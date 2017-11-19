@@ -72,10 +72,7 @@ void loop() {
     //mqtt
 
 	String payload = "{\"licked\":";
-	// Args:
-	//   input: The value to print
-	//   base:  The output base.
-	payload += uint64ToString(uint64_t results.value(),uint8_t 8) ;
+	payload += uint64ToString(uint64_t results.value(),uint8_t base) ;
 	payload += ",\"millis\":";
 	payload += millis();
 	payload += "}";

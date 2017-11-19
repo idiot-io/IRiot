@@ -10,11 +10,17 @@
 
 */
 
-#include "tiny_IRremote.h"
+#include "tiny_IRremote.h" 
 
 #define ledPin    0     // pin5 / PB0
 IRsend irsend;          // pin3 / PB4 / Digital 4 / TIMER1 output compare unit
 #define YOUR_NEC_CODE 9000
+
+/*
+ * MD5_Hash library for Arduino 
+ * https://github.com/tzikis/ArduinoMD5 
+*/
+#include "ArduinoMD5/MD5.h"
 
 int ledState = LOW;
 
@@ -76,8 +82,24 @@ uint8_t timer;
 int netcode;
 
 void setup() {
+	
+	//////////////
   tinytouch_init();
-
+  /////////////////
+  unsigned char* hash=MD5::make_hash("hello world");
+  /*
+  // MD5_Hash///////////////////////////
+  //generate the MD5 hash for our string
+  unsigned char* hash=MD5::make_hash("hello world");
+  //generate the digest (hex encoding) of our hash
+  char *md5str = MD5::make_digest(hash, 16);
+  free(hash);
+  //print it on our serial monitor
+  Serial.println(md5str);
+  //Give the Memory back to the System if you run the md5 Hash generation in a loop
+  free(md5str);
+  //////////////////////////////////
+*/
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
   
@@ -89,9 +111,10 @@ void loop() {
   uint8_t touchstate = tinytouch_sense();
   if (touchstate == tt_push) {
     ledState = HIGH;
-    //irsend.sendNEC(YOUR_NEC_CODE, 32); // sending the nec code
 	
+    //irsend.sendNEC(YOUR_NEC_CODE, 32); // sending the nec code
     irsend.sendNEC(netcode, 32); // sending the nec code
+	
     digitalWrite(ledPin, ledState);
   }
   if (touchstate == tt_release) {
