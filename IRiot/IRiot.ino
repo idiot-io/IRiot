@@ -3,10 +3,10 @@
    code https://github.com/shenkarSElab/IRiot
 
    pin out attiny85
-   NC      --+----+-- VCC
-   Touch   --|*   |-- NC
-   IRsend  --|    |-- NC
-   GND     --+----+-- LED
+   NC      -1+----+8- VCC
+   Touch   -2|*   |7- NC
+   IRsend  -3|    |6- NC
+   GND     -4+----+5- LED
 
 */
 
@@ -15,12 +15,6 @@
 #define ledPin    0     // pin5 / PB0
 IRsend irsend;          // pin3 / PB4 / Digital 4 / TIMER1 output compare unit
 #define YOUR_NEC_CODE 9000
-
-/*
- * MD5_Hash library for Arduino 
- * https://github.com/tzikis/ArduinoMD5 
-*/
-#include "ArduinoMD5/MD5.h"
 
 int ledState = LOW;
 
@@ -86,20 +80,7 @@ void setup() {
 	//////////////
   tinytouch_init();
   /////////////////
-  unsigned char* hash=MD5::make_hash("hello world");
-  /*
-  // MD5_Hash///////////////////////////
-  //generate the MD5 hash for our string
-  unsigned char* hash=MD5::make_hash("hello world");
-  //generate the digest (hex encoding) of our hash
-  char *md5str = MD5::make_digest(hash, 16);
-  free(hash);
-  //print it on our serial monitor
-  Serial.println(md5str);
-  //Give the Memory back to the System if you run the md5 Hash generation in a loop
-  free(md5str);
-  //////////////////////////////////
-*/
+
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
   

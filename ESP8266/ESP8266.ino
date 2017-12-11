@@ -1,8 +1,8 @@
 
-/* 
- *  test on your server with 
- *  $ mosquitto_sub -h 127.0.0.1 -i testSub -t outLicks
- *  
+/*
+    test on your server with
+    $ mosquitto_sub -h 127.0.0.1 -i testSub -t outLicks
+
 */
 
 /////////////////////////////////////////////////////////////////////////////
@@ -71,41 +71,41 @@ void loop() {
 
     //mqtt
 
-	String payload = "{\"licked\":";
-	payload += uint64ToString(uint64_t results.value(),uint8_t base) ;
-	payload += ",\"millis\":";
-	payload += millis();
-	payload += "}";
-  
+    String payload = "{\"licked\":";
+    /*
+      payload += uint64ToString(uint64_t results.value(),uint8_t base) ;
+      payload += ",\"millis\":";
+      payload += millis();
+      payload += "}";
+    */
 
-	
-	if (client.publish(outLicks, (char*) payload.c_str())) {
+    if (client.publish("outLicks", (char*) payload.c_str())) {
       Serial.println("Publish ok");
     }
-	else {
+    else {
       Serial.println("Publish failed");
     }
-	
-	/*
-	++value;
-    snprintf (msg, 128, "licked %lld @ %ld", results.value, millis() );
-	
-	
-	    Serial.print("Publish message: ");
-    Serial.println(msg);
-    client.publish("outLicks", msg);
-	
-    // print() & println() can't handle printing long longs. (uint64_t)
-    serialPrintUint64(results.value, HEX);
-    Serial.println("");
 
-	*/
+    /*
+      ++value;
+      snprintf (msg, 128, "licked %lld @ %ld", results.value, millis() );
+
+
+        Serial.print("Publish message: ");
+      Serial.println(msg);
+      client.publish("outLicks", msg);
+
+      // print() & println() can't handle printing long longs. (uint64_t)
+      serialPrintUint64(results.value, HEX);
+      Serial.println("");
+
+    */
     delay(100);
-    
+
     irrecv.resume();  // Receive the next value
   }
 
-  
+
   digitalWrite(ledStatus, LOW);
 
 }
