@@ -17,8 +17,7 @@
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 #include <IRutils.h>
-// An IR detector/demodulator is connected to GPIO pin 14(D5 on a NodeMCU).
-uint16_t RECV_PIN = 14;
+uint16_t RECV_PIN = 14; // An IR detector/demodulator is connected to GPIO pin 14(D5 on a NodeMCU).
 IRrecv irrecv(RECV_PIN);
 decode_results results;
 
@@ -27,10 +26,6 @@ decode_results results;
 #include <PubSubClient.h>
 WiFiClient espClient;
 PubSubClient client(espClient);
-long lastMsg = 0;
-char msg[50];
-int value = 0;
-
 const char* mqtt_server = "idiot.io";
 
 ///////////////////////////////////////////////
@@ -71,43 +66,30 @@ void loop() {
 
     //mqtt
 
-    String payload = "{\"licked\":";
-    /*
-      payload += uint64ToString(uint64_t results.value(),uint8_t base) ;
-      payload += ",\"millis\":";
-      payload += millis();
-      payload += "}";
-    */
+    String txt = uint64ToString(results.value, 16);
+    char charBuf[50];
+    txt.toCharArray(charBuf, 16);
 
-    if (client.publish("outLicks", (char*) payload.c_str())) {
-      Serial.println("Publish ok");
-    }
-    else {
-      Serial.println("Publish failed");
-    }
+    client.publish("outLicks", charBuf );
 
+    delay(100);
+
+    irrecv.resume();  // Receive the next value
+
+    digitalWrite(ledStatus, LOW);
     /*
       ++value;
       snprintf (msg, 128, "licked %lld @ %ld", results.value, millis() );
 
-
-        Serial.print("Publish message: ");
+      Serial.print("Publish message: ");
       Serial.println(msg);
       client.publish("outLicks", msg);
 
       // print() & println() can't handle printing long longs. (uint64_t)
       serialPrintUint64(results.value, HEX);
       Serial.println("");
-
     */
-    delay(100);
-
-    irrecv.resume();  // Receive the next value
   }
-
-
-  digitalWrite(ledStatus, LOW);
-
 }
 
 //MQTT functions
