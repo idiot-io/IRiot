@@ -3,14 +3,14 @@
    code https://github.com/shenkarSElab/IRiot
 
    pin out attiny85
-   NC      --+----+-- VCC
-   Touch   --|*   |-- NC
-   IRsend  --|    |-- NC
-   GND     --+----+-- LED
+   NC      -1+----+8- VCC
+   Touch   -2|*   |7- NC
+   IRsend  -3|    |6- NC
+   GND     -4+----+5- LED
 
 */
 
-#include "tiny_IRremote.h"
+#include "tiny_IRremote.h" 
 
 #define ledPin    0     // pin5 / PB0
 IRsend irsend;          // pin3 / PB4 / Digital 4 / TIMER1 output compare unit
@@ -76,7 +76,10 @@ uint8_t timer;
 int netcode;
 
 void setup() {
+	
+	//////////////
   tinytouch_init();
+  /////////////////
 
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
@@ -89,9 +92,10 @@ void loop() {
   uint8_t touchstate = tinytouch_sense();
   if (touchstate == tt_push) {
     ledState = HIGH;
-    //irsend.sendNEC(YOUR_NEC_CODE, 32); // sending the nec code
 	
+    //irsend.sendNEC(YOUR_NEC_CODE, 32); // sending the nec code
     irsend.sendNEC(netcode, 32); // sending the nec code
+	
     digitalWrite(ledPin, ledState);
   }
   if (touchstate == tt_release) {
