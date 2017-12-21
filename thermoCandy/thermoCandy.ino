@@ -19,34 +19,46 @@ const int pinLM35 = A0;
 PreciseLM35 lm35(pinLM35, DEFAULT);
 ////////////////////////////////////
 
-//////////////////
-// https://github.com/arduino/Arduino/issues/3934
-const int filterWeight = 8;  // higher numbers = heavier filtering
+/////////////////////////////////
 const int numReadings = 10;
+int readings[numReadings];      // the readings from the analog input
+int readIndex = 0;              // the index of the current reading
+int total = 0;                  // the running total
 int average = 0;                // the average
+
 
 void setup() {
   Serial.begin(9600);
   pixels.begin();
 
-  average = analogRead(pinLM35);
+  for (int thisReading = 0; thisReading < numReadings; thisReading++) {
+    readings[thisReading] = 0;
+  }
 }
 
 void loop() {
   int temp = lm35.readCelsius();
+  
+  total = total - readings[readIndex];
+  readings[readIndex] = temp;
+  total += readings[readIndex];
+  readIndex += 1;
 
-  for (int i = 0; i < numReadings; i++) {
-    average = average + (temp - average) / filterWeight;
+  if (readIndex >= numReadings) {
+    readIndex = 0;
   }
+
+  average = total / numReadings;
   Serial.println(String(average) + " " + String(temp));
 
+
   byte red, green, blue;
-  constrain(temp, 24, 32);
-  red = map(temp, 24, 32, 0, 255);
+  constrain(average, 24, 38);
+  red = map(average, 24, 32, 0, 255);
   green = 255 - red;
   blue = 0;
 
   pixels.setPixelColor(0, pixels.Color(red, green, blue));
   pixels.show();
-  
+
 }
