@@ -8,9 +8,9 @@
 
    pin out attiny85
    NC      -1+----+8- VCC
-   Pixel   -2|*   |7- NC
-   Thermo  -3|    |6- NC
-   GND     -4+----+5- NC
+   NC      -2|*   |7- NC
+   Thermo  -3|    |6- Pixel
+   GND     -4+----+5- Serial (debug)
    http://drazzy.com/e/img/PinoutT85a.jpg
 */
 
@@ -25,7 +25,7 @@ SendOnlySoftwareSerial mySerial (0);  // Tx pin , PB0, pin5
 #ifdef __AVR__
 #include <avr/power.h>
 #endif
-#define pixelPin 3 //PB4, pin3
+#define pixelPin 1 //PB1, pin6
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(1, pixelPin, NEO_GRB + NEO_KHZ800);
 
 ///////////////////////////////
@@ -50,8 +50,8 @@ void loop() {
 
 
   byte red, green, blue;
-  if (average > 24  && average < 35) {
-    green = mapfloat(average, 24, 37, 0, 255);
+  if (average > 20  && average < 35) {
+    green = mapfloat(average, 20, 37, 0, 255);
     blue = 255 - red;
     red = 0;
   } else if (average >= 35  && average < 36.5) {
@@ -78,7 +78,13 @@ void loop() {
   mySerial.print(green);
   mySerial.print(" ");
   mySerial.println(blue);
-
+  /*
+    for (int i = 0; i < 255; i++) {
+    pixels.setPixelColor(0, pixels.Color(i, 255 - i, 0));
+    pixels.show();
+    delay(10);
+    }
+  */
 
   delay(10);
 
