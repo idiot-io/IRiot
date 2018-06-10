@@ -5,8 +5,8 @@
    pin out attiny85
    NC      -1+----+8- VCC
    Touch   -2|*   |7- NC
-   IRsend  -3|    |6- NC
-   GND     -4+----+5- LED
+   IRsend  -3|    |6- LED
+   GND     -4+----+5- NC
 
 */
 

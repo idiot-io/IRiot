@@ -22,7 +22,7 @@ IRrecv irrecv(RECV_PIN);
 decode_results results;
 
 /////////////////////////////////////////////////////////////////////////////
-//mqtt broker https://github.com/knolleary/pubsubclient
+//mqtt broker https://github.com/knolleary/pubsubclient - http://pubsubclient.knolleary.net/
 #include <PubSubClient.h>
 WiFiClient espClient;
 PubSubClient client(espClient);
